@@ -1,0 +1,37 @@
+import jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+from jwt.exceptions import InvalidTokenError
+
+from app.core.config import settings
+
+
+pwd_context = CryptContext(schemes=['argon2'], deprecated='auto')
+
+def hash_password(plain: str) -> str:
+    return pwd_context.hash(plain)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(email: str, expires_delta: Optional[timedelta] = None) -> str:
+    if expires_delta is None:
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    else:
+        expire = datetime.now(timezone.utc) + expires_delta
+    payload = {"sub": email, "exp": expire}
+    token = jwt.encode(
+        payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return token
+
+def decode_access_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        return payload
+    except InvalidTokenError:
+        return None
