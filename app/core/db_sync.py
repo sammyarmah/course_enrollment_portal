@@ -12,8 +12,10 @@ engine = create_engine(
 SessionLocal = sessionmaker(
     autocommit=False, 
     autoflush=False, 
-    bind=engine
+    bind=engine 
 )
+
+print("SYNC DB URL:", settings.DATABASE_URL_SYNC)
 
 class Base(DeclarativeBase):
     pass

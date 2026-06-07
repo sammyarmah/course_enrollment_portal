@@ -1,8 +1,6 @@
 from logging.config import fileConfig
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
 from app.core.db_async import Base
 from app.core.config import settings
@@ -14,6 +12,8 @@ from app.models.enrollments import Enrollment
 # access to the values within the .ini file in use.
 config = context.config
 database_url = settings.DATABASE_URL_SYNC
+
+print("ALEMBIC DATABASE URL:", database_url)
 
 if not database_url:
     raise ValueError("DATABASE_URL is not set in the configuration")
